@@ -2,6 +2,7 @@ from stock_api import fetch_stock_history, calculate_changes
 from ui import print_stock_info, print_error
 from AI_News import print_news
 
+
 def process_input(user_input):
     # Future enhancement: Look for flags like -NEWS here
     parts = user_input.split()
@@ -17,7 +18,7 @@ def process_input(user_input):
 
     stock_data = calculate_changes(history)
     print_stock_info(symbol, stock_data)
-    NEWS = "-NEWS" in flags
+    NEWS = "-NEWS" == flags[0] if flags else False
     print_news(NEWS, symbol)
 
 if __name__ == "__main__":

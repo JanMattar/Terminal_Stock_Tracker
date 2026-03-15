@@ -48,7 +48,7 @@ def print_news(NEWS, symbol=None):
 
         if news_summary:
             prompt = f"Based on this recent news for {symbol.upper()}:\n{news_summary}\n\nProvide a brief, concise explanation (under 100 words) why the stock is moving today."
-            response = client.models.generate_content_stream(model="gemini-2.0-flash-lite", contents=prompt)
+            response = client.models.generate_content_stream(model="gemini-2.5-flash-lite", contents=prompt)
             
             print(f"\n--- {symbol.upper()} NEWS ---")
             for chunk in response:
