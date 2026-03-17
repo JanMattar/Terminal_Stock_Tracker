@@ -3,17 +3,18 @@
 A simple, fast terminal tool to manage a local stock portfolio, track live performance, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
 
 ### The Architecture
+
 I built this project to balance speed, privacy, and reliability:
 
-Local Event Ledger: All BUY and SELL transactions are saved locally to a Portfolio.json file. The app calculates your current holdings, average cost, and Profit/Loss (P&L) on the fly by reading this transaction history.
+Local Event Ledger: All BUY, SELL, and DIVIDEND transactions are saved locally to a Portfolio.json file. The app calculates your current holdings, average cost, and Profit/Loss (P&L) on the fly using this event history.
 
-Live Prices (yfinance): Uses yfinance to grab live market data and historical charts to calculate your portfolio's real-time value. Fast and free.
+Live Prices & Terminal Charts: Uses yfinance to grab live market data and historical pricing. It integrates with plotext to draw clean, responsive ASCII line charts directly in your terminal window. Fast and free.
 
-News (Yahoo RSS + Gemini): Bypasses web scrapers by pulling directly from Yahoo’s official RSS XML feed. The headlines are then streamed through Google's gemini-2.5-flash-lite model for a quick, character-by-character summary of why a stock is moving.
+News & AI Advisor (Gemini): Bypasses web scrapers by pulling directly from Yahoo’s official RSS XML feed. Headlines are streamed through Google's gemini-2.5-flash-lite model for a quick summary of why a stock is moving. It also features a Portfolio Advisor that analyzes your live allocations to provide instant, professional critiques on diversification and risk.
 
 ### Quick Start
 
-Install dependencies: pip install yfinance google-genai python-dotenv
+Install dependencies: pip install yfinance google-genai python-dotenv plotext
 
 Add your key: Create a .env file and add GEMINI_API_KEY=your_key_here
 
