@@ -126,13 +126,21 @@ def show_portfolio():
         print("No current holdings. Your portfolio is empty.")
         return
 
-    print(f"\n{'--- PORTFOLIO ---'.center(95)}")
-    print(f" {'Ticker':^7} {'Shares':^6} {'Holdings':^10} {'Avg-Cost':^9} {'Current-Price':^13} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change'}")
-    print ("-" * 110)
+    prices = {}
+    total_value = 0
+    for ticker, (qty, avg_cost) in current_holdings.items():
+        price = get_current_price(ticker)
+        prices[ticker] = price
+        if price:
+            total_value += price * qty
+
+    print(f"\n{'--- PORTFOLIO ---'.center(120)}")
+    print(f" {'Ticker':^7} {'Shares':^6} {'Holdings':^10} {'Avg-Cost':^9} {'Current-Price':^13} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change':^16} {'Allocation':^11}")
+    print ("-" * 125)
     total_profit = 0
     total_cost = 0
     for ticker, (qty, avg_cost) in current_holdings.items():
-        current_price = get_current_price(ticker)
+        current_price = prices.get(ticker)
         if current_price:
             try:
                 history_2d = yf.Ticker(ticker).history(period="2d") 
@@ -148,9 +156,10 @@ def show_portfolio():
             total_profit += all_time_gain
             pnl_color = GREEN if all_time_gain >= 0 else RED
             daily_color = GREEN if daily_gain >= 0 else RED
-            print(f"  {ticker:<7}{qty:<7} ${avg_cost * qty:<7.2f}  ${avg_cost:<10.2f} ${current_price:<14.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<10.2f}{RESET} {pnl_color}{all_time_pct:>9.2f}%{RESET}")
+            allocation_pct = ((avg_cost * qty) / total_value) * 100 if total_value > 0 else 0
+            print(f"  {ticker:<7}{qty:<7} ${avg_cost * qty:<7.2f}  ${avg_cost:<10.2f} ${current_price:<14.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<8.2f}{RESET} {pnl_color}{all_time_pct:>12.2f}%{RESET} {allocation_pct:>12.2f}%")
         else:
-            print(f"  {ticker:<6}  {qty:<8} ${avg_cost * qty:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A")
+            print(f"  {ticker:<6}  {qty:<8} ${avg_cost * qty:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A             N/A")
     total_color = GREEN if total_profit >= 0 else RED
     total_value = total_cost + total_profit
     total_pct = (total_profit / total_cost) * 100 if total_cost > 0 else 0
