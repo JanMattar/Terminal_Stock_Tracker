@@ -135,19 +135,27 @@ def show_portfolio(ai_analysis=False, benchmark=False):
     cost = {}
     dividends = {}
 
+    avg_costs = {}
     for entry in ledger:
+        ticker = entry['ticker']
         if entry['action'] == 'BUY':
-            holdings[entry['ticker']] = holdings.get(entry['ticker'], 0) + entry['quantity']
-            cost[entry['ticker']] = cost.get(entry['ticker'], 0) + (entry['quantity'] * entry['price'])
+            current_qty = holdings.get(ticker, 0)
+            current_avg = avg_costs.get(ticker, 0)
+            
+            new_total_cost = (current_qty * current_avg) + (entry['quantity'] * entry['price'])
+            new_qty = current_qty + entry['quantity']
+            
+            avg_costs[ticker] = new_total_cost / new_qty if new_qty > 0 else 0
+            holdings[ticker] = new_qty
+            
         elif entry['action'] == 'SELL':
-            #WE CAN ASSUME THAT THE TICKER IS IN HOLDINGS SINCE WE ARE SELLING (WE CHECK FOR THIS IN THE SELL_STOCK FUNCTION)
-            holdings[entry['ticker']] -= entry['quantity']
-            cost[entry['ticker']] -= (entry['quantity'] * entry['price'])
+            holdings[ticker] -= entry['quantity']
+            
         elif entry['action'] == 'DIVIDEND':
-            dividends[entry['ticker']] = dividends.get(entry['ticker'], 0) + entry['price']
+            dividends[ticker] = dividends.get(ticker, 0) + entry['price']
 
-    #FILTER OUT THE CLOSED POSITIONS - CURRENT HOLDING OBJ = <TICKER>: (QUANTITY, AVG COST)
-    current_holdings = {ticker: (qty, cost/qty) for ticker, (qty, cost) in [(ticker, (holdings[ticker], cost[ticker])) for ticker in holdings if holdings[ticker] > 0]}
+    # Create the current_holdings dictionary using the new avg_costs map
+    current_holdings = {ticker: (qty, avg_costs[ticker]) for ticker, qty in holdings.items() if qty > 0}
     if not current_holdings:
         print("No current holdings. Your portfolio is empty.")
         return
@@ -195,12 +203,12 @@ def show_portfolio(ai_analysis=False, benchmark=False):
     total_color = GREEN if total_profit >= 0 else RED
     total_value = total_cost + total_profit
     total_pct = (total_profit / total_cost) * 100 if total_cost > 0 else 0
-    total_dailt_pct = (total_daily_gain / (total_value - total_daily_gain)) * 100 if (total_value - total_daily_gain) > 0 else 0
+    total_daily_pct = (total_daily_gain / (total_value - total_daily_gain)) * 100 if (total_value - total_daily_gain) > 0 else 0
     total_daily_color = GREEN if total_daily_gain >= 0 else RED
 
 
     print(f"\nTotal Portfolio value : ${total_value:.2f}")
-    print(f"     Daily Gain       : {total_daily_color}${total_daily_gain:.2f} {total_dailt_pct:.2f}%{RESET}")
+    print(f"     Daily Gain       : {total_daily_color}${total_daily_gain:.2f} {total_daily_pct:.2f}%{RESET}")
     print(f"    Total Profit      : {total_color}${total_profit:.2f} {total_pct:.2f}%{RESET}")
     print("\n")
 
