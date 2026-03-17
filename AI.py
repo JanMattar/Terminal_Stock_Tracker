@@ -4,8 +4,17 @@ import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
 from google import genai as ai
 from ui import print_error
+from functools import lru_cache
 
 load_dotenv()
+
+@lru_cache(maxsize=32)
+def get_cached_ai_summary(symbol, news_summary):
+    client = ai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    prompt = f"Based on this recent news for {symbol.upper()}:\n{news_summary}\n\nProvide a brief, concise explanation (under 100 words) why the stock is moving today."
+    
+    response = client.models.generate_content(model="gemini-2.5-flash-lite", contents=prompt)
+    return response.text
 
 def get_news_rss(symbol):
     url = f"https://finance.yahoo.com/rss/headline?s={symbol}"
@@ -36,8 +45,6 @@ def print_news(symbol=None):
         return
     
     try:
-        client = ai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
         news = get_news_rss(symbol)
         
         news_summary = "\n".join([
@@ -47,12 +54,10 @@ def print_news(symbol=None):
         ])
 
         if news_summary:
-            prompt = f"Based on this recent news for {symbol.upper()}:\n{news_summary}\n\nProvide a brief, concise explanation (under 100 words) why the stock is moving today."
-            response = client.models.generate_content_stream(model="gemini-2.5-flash-lite", contents=prompt)
-            
             print(f"--- {symbol.upper()} NEWS ---".center(150))
-            for chunk in response:
-                print(chunk.text, end="", flush=True) 
+            
+            analysis = get_cached_ai_summary(symbol, news_summary)
+            print(analysis)
             print() 
 
         else:
