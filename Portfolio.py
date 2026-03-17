@@ -62,6 +62,19 @@ def sell_stock(ticker, quantity, price):
     save_ledger(ledger)
     print(f"{RED}Sold {quantity} shares of {ticker.upper()} at ${price:.2f} for a total of ${quantity * price:.2f}.{RESET}")
 
+def add_dividend(ticker, amount):
+    ledger = load_ledger()
+    ledger.append({
+        "timestamp": datetime.now().isoformat(),
+        "action": "DIVIDEND",
+        "ticker": ticker.upper(),
+        "quantity": 0.0,
+        "price": amount
+    })
+    save_ledger(ledger)
+    print(f"{GREEN}Dividend of ${amount} recorded for {ticker.upper()}{RESET}")
+
+
 def remove_last():
     ledger = load_ledger()
     if not ledger:
@@ -69,7 +82,10 @@ def remove_last():
         return
     removed = ledger.pop()
     save_ledger(ledger)
-    print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f}.{RESET}")
+    if removed['action'] == 'DIVIDEND':
+        print(f"{RED}Removed last transaction: {removed['action']} ${removed['price']:.2f} for {removed['ticker']}{RESET}")
+    else:
+        print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f}.{RESET}")
 
 def show_history(tickers=None):
     ledger = load_ledger()
@@ -99,9 +115,13 @@ def show_history(tickers=None):
     for entry in filtered:
         date = datetime.fromisoformat(entry["timestamp"])
         nice_time = date.strftime("%Y-%m-%d %H:%M")
-        total = entry['quantity'] * entry['price']
-        print(f" {nice_time:<20} {entry['action']:<7} {entry['ticker']:<7} {entry['quantity']:<7}  ${entry['price']:<8.2f} ${total:<10.2f}")
+        total = entry['price'] if entry['action'] == 'DIVIDEND' else entry['quantity'] * entry['price']
+        if entry['action'] != 'DIVIDEND':
+            print(f" {nice_time:<20} {entry['action']:<7} {entry['ticker']:<7} {entry['quantity']:<7}  ${entry['price']:<8.2f} ${total:<10.2f}")
+        elif entry['action'] == 'DIVIDEND':
+            print(f" {nice_time:<18} {entry['action']:<9} {entry['ticker']:<7} {entry['quantity']:<7}  ${entry['price']:<8.2f} ${total:<10.2f}")
     print("\n")
+
 def get_current_price(ticker):
     try:
         return yf.Ticker(ticker).history(period="1d")['Close'].iloc[-1]
@@ -112,6 +132,8 @@ def show_portfolio():
     ledger = load_ledger()
     holdings = {}
     cost = {}
+    dividends = {}
+
     for entry in ledger:
         if entry['action'] == 'BUY':
             holdings[entry['ticker']] = holdings.get(entry['ticker'], 0) + entry['quantity']
@@ -120,6 +142,8 @@ def show_portfolio():
             #WE CAN ASSUME THAT THE TICKER IS IN HOLDINGS SINCE WE ARE SELLING (WE CHECK FOR THIS IN THE SELL_STOCK FUNCTION)
             holdings[entry['ticker']] -= entry['quantity']
             cost[entry['ticker']] -= (entry['quantity'] * entry['price'])
+        elif entry['action'] == 'DIVIDEND':
+            dividends[entry['ticker']] = dividends.get(entry['ticker'], 0) + entry['price']
 
     #FILTER OUT THE CLOSED POSITIONS - CURRENT HOLDING OBJ = <TICKER>: (QUANTITY, AVG COST)
     current_holdings = {ticker: (qty, cost/qty) for ticker, (qty, cost) in [(ticker, (holdings[ticker], cost[ticker])) for ticker in holdings if holdings[ticker] > 0]}
@@ -151,7 +175,7 @@ def show_portfolio():
             except:
                 daily_gain = 0
                 daily_pct = 0
-            all_time_gain = (current_price - avg_cost) * qty
+            all_time_gain = (current_price - avg_cost) * qty + dividends.get(ticker, 0)
             all_time_pct = ((current_price - avg_cost) / avg_cost) * 100 if avg_cost > 0 else 0
             total_cost += avg_cost * qty
             total_profit += all_time_gain
@@ -164,7 +188,14 @@ def show_portfolio():
     total_color = GREEN if total_profit >= 0 else RED
     total_value = total_cost + total_profit
     total_pct = (total_profit / total_cost) * 100 if total_cost > 0 else 0
-    print(f"\nTotal Portfolio value: ${total_value:.2f}  Total Profit: {total_color}${total_profit:.2f} {total_pct:.2f}%{RESET} ")
+
+    # total_daily_gain = sum(
+    #     (prices[Ticker] )
+    # )
+
+    print(f"\nTotal Portfolio value: ${total_value:.2f}")
+    print(f"Total Profit: {total_color}${total_profit:.2f} {total_pct:.2f}%{RESET}")
+
     print("\n")
 
 

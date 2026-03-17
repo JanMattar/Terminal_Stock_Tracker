@@ -27,6 +27,7 @@ Run it: python3 tracker.py
 | `<Ticker> -NEWS` | Get stock info + AI news summary | `VOO -NEWS` |
 | `BUY` | Buy shares (saved to local ledger) | `BUY VOO 1.57 593.32` |
 | `SELL` | Sell shares | `SELL VOO 0.50 615.10` |
+| `DIVIDEND` | Record a dividend payment | `DIVIDEND VOO 3.50` |
 | `PORTFOLIO` | View current holdings, average cost, and P&L | `PORTFOLIO` |
 | `EXPORT` | Export transaction history to CSV | `EXPORT` |
 | `HISTORY` | View all past transactions | `HISTORY` |

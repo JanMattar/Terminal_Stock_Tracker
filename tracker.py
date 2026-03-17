@@ -1,7 +1,7 @@
 from stock_api import fetch_stock_history, calculate_changes
 from ui import print_stock_info, print_error, RESET
 from AI_News import print_news
-from Portfolio import buy_stock, sell_stock, show_history, remove_last, show_portfolio, export_csv
+from Portfolio import buy_stock, sell_stock, show_history, remove_last, show_portfolio, export_csv, add_dividend
 
 
 def process_input(user_input):
@@ -61,6 +61,7 @@ if __name__ == "__main__":
                 print("      VOO -NEWS")
                 print("      BUY VOO 1.57 593.32")
                 print("      SELL VOO 0.50 615.10")
+                print(f"\033[93m    {'DIVIDEND <Ticker> <Amount>':<34}{RESET} : Record a dividend payment\n")
                 print("      PORTFOLIO")
                 print("      EXPORT")
                 print("      HISTORY")
@@ -93,6 +94,10 @@ if __name__ == "__main__":
 
             elif command == "portfolio":
                 show_portfolio()
+
+            elif command == "dividend" and len(args) == 2:
+                ticker, amount = args[0].upper(), round(float(args[1]), 2)
+                add_dividend(ticker, amount)
             
             elif command == "export":
                 export_csv()
