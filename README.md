@@ -1,6 +1,5 @@
 # Terminal Portfolio Tracker
 
-=======
 A simple, fast terminal tool to manage a local stock portfolio, track live performance, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
 
 ### The Architecture
@@ -22,7 +21,6 @@ Run it: python3 tracker.py
 
 ### Available Commands
 
-<<<<<<< HEAD
 | Command | Description | Example |
 | :--- | :--- | :--- |
 | `<Ticker>` | Get current price and historical performance | `VOO` |
