@@ -78,13 +78,35 @@ if __name__ == "__main__":
                 print("=" * 80)
                 print()
 
-            elif command == "buy" and len(args) == 3:
-                ticker, qty, price = args[0], round(float(args[1]), 4), round(float(args[2]), 2)
-                buy_stock(ticker, qty, price)
+            elif command == "buy":
+                if len(args) != 3:
+                    print_error("Invalid input for BUY command. Usage: BUY <Ticker> <Amount> <Price> | Example: BUY VOO 1.57 593.32")
+                    continue
+                try:
+                    ticker, qty, price = args[0], round(float(args[1]), 4), round(float(args[2]), 2)
+                    buy_stock(ticker, qty, price)
+                except ValueError:
+                    print_error("Invalid input for BUY command. Usage: BUY <Ticker> <Amount> <Price> | Example: BUY VOO 1.57 593.32")
 
-            elif command == "sell" and len(args) == 3:
-                ticker, qty, price = args[0], round(float(args[1]), 4), round(float(args[2]), 2)
-                sell_stock(ticker, qty, price)
+            elif command == "sell":
+                if len(args) != 3:
+                    print_error("Invalid input for SELL command. Usage: SELL <Ticker> <Amount> <Price> | Example: SELL VOO 0.50 615.10")
+                    continue
+                try:
+                    ticker, qty, price = args[0], round(float(args[1]), 4), round(float(args[2]), 2)
+                    sell_stock(ticker, qty, price)
+                except ValueError:
+                    print_error("Invalid input for SELL command. Usage: SELL <Ticker> <Amount> <Price> | Example: SELL VOO 0.50 615.10")
+
+            elif command == "dividend":
+                if len(args) != 2:
+                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> | Example: DIVIDEND VOO 1.57")
+                    continue
+                try:
+                    ticker, amount = args[0].upper(), round(float(args[1]), 2)
+                    add_dividend(ticker, amount)
+                except ValueError:
+                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> | Example: DIVIDEND VOO 1.57")
 
             elif command == "history":
                 if not args:
@@ -101,10 +123,6 @@ if __name__ == "__main__":
 
             elif command == "portfolio":
                 show_portfolio(ai_analysis="-AI" in args, benchmark="-VS" in args)
-
-            elif command == "dividend" and len(args) == 2:
-                ticker, amount = args[0].upper(), round(float(args[1]), 2)
-                add_dividend(ticker, amount)
             
             elif command == "export":
                 export_csv()
