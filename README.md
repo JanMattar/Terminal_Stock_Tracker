@@ -1,21 +1,33 @@
-# Terminal Stock Tracker
+# Terminal Portfolio Tracker
 
-A lightweight, high-speed terminal tool to track US stocks and get AI-powered news analysis. Built to be fast, readable, and resilient.
+A simple, fast terminal tool to manage a local stock portfolio, track live performance, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
 
-### The Architecture (A Hybrid Approach)
-I built this project to balance speed and reliability by mixing two different data retrieval strategies:
+### The Architecture
+I built this project to balance speed, privacy, and reliability:
 
-Prices (yfinance): Uses an unofficial web scraper. It's the fastest, free way to get live market data, but it can be brittle.
+Local Event Ledger: All BUY and SELL transactions are saved locally to a Portfolio.json file. The app calculates your current holdings, average cost, and Profit/Loss (P&L) on the fly by reading this transaction history.
 
-News (Yahoo RSS): Bypasses web scraping entirely. Because news scrapers frequently break or get shadowbanned, I wrote a custom XML fetcher that pulls directly from Yahoo’s official RSS syndication.
+Live Prices (yfinance): Uses yfinance to grab live market data and historical charts to calculate your portfolio's real-time value. Fast and free.
 
-Analysis (gemini-2.0-flash-lite): Uses Google's high-speed "Lite" model to summarize the RSS headlines. I implemented text streaming so the AI's thoughts print to the terminal instantly, character-by-character.
+News (Yahoo RSS + Gemini): Bypasses web scrapers by pulling directly from Yahoo’s official RSS XML feed. The headlines are then streamed through Google's gemini-2.5-flash-lite model for a quick, character-by-character summary of why a stock is moving.
 
 ### Quick Start
+
 Install dependencies: pip install yfinance google-genai python-dotenv
 
 Add your key: Create a .env file and add GEMINI_API_KEY=your_key_here
 
-Run it: python tracker.py
+Run it: python3 tracker.py
 
-Example: Type NVDA -NEWS to see the live price followed by the AI market summary.
+### Available Commands
+
+|     Command      |                 Description                     |        Example        |
+|                  |                                                 |                       |
+|      `BUY`       |                  Buy shares                     | `BUY VOO 1.57 593.32` |
+|      `SELL`      |                  Sell shares                    | `SELL VOO 0.50 615.10`|
+|    `PORTFOLIO`   | View current holdings, average cost, and profit |      `PORTFOLIO`      |
+|     `HISTORY`    |           View all past transactions            |       `HISTORY`       |
+|     `REMOVE`     |            Undo the last transaction            |       `REMOVE`        |
+|    `<Ticker>`    |   Get current price and historical performance  |         `VOO`         |
+| `<Ticker> -NEWS` |      Get stock info + AI news summary           |      `VOO -NEWS`      |
+|     `HELP`       |            Show the help menu                   |        `HELP`         |
