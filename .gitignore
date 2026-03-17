@@ -1,5 +1,5 @@
 .env
-Portfolio.json
+data/
 *.csv
 __pycache__/
 *.pyc

@@ -6,7 +6,7 @@ from ui import print_error, RED, GREEN, RESET
 import csv
 from AI import analyze_portfolio
 
-PORTFOLIO_FILE = "Portfolio.json"
+PORTFOLIO_FILE = "data/Portfolio.json"
 
 def load_ledger():
     if not os.path.exists(PORTFOLIO_FILE):
