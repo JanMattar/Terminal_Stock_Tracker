@@ -1,4 +1,4 @@
-# Terminal Stock Tracker
+# Terminal Portfolio Tracker
 
 =======
 A simple, fast terminal tool to manage a local stock portfolio, track live performance, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
