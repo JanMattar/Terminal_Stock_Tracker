@@ -28,6 +28,7 @@ Run it: python3 tracker.py
 | `BUY` | Buy shares (saved to local ledger) | `BUY VOO 1.57 593.32` |
 | `SELL` | Sell shares | `SELL VOO 0.50 615.10` |
 | `PORTFOLIO` | View current holdings, average cost, and P&L | `PORTFOLIO` |
+| `EXPORT` | Export transaction history to CSV | `EXPORT` |
 | `HISTORY` | View all past transactions | `HISTORY` |
 | `HISTORY -<Ticker> [-<Ticker>...]` | Filter history by ticker(s) | `HISTORY -VOO -AAPL` |
 | `REMOVE` | Undo the last transaction | `REMOVE` |

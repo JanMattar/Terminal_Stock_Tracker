@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import yfinance as yf
 from ui import print_error, RED, GREEN, RESET
+import csv
 
 PORTFOLIO_FILE = "Portfolio.json"
 
@@ -167,7 +168,26 @@ def show_portfolio():
     print("\n")
 
 
+def export_csv():
+    ledger = load_ledger()
+    if not ledger:
+        print("No transactions to export.")
+        return
 
+    filename = f"portfolio_export_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.csv"
+    with open(filename, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["timestamp", "action", "ticker", "quantity", "price", "total"])
+        writer.writeheader()
+        for entry in ledger:
+            writer.writerow({
+                "timestamp": entry["timestamp"],
+                "action": entry["action"],
+                "ticker": entry["ticker"],
+                "quantity": entry["quantity"],
+                "price": entry["price"],
+                "total": entry["quantity"] * entry["price"]
+            })
+    print(f"{GREEN}Exported {len(ledger)} transactions to {filename}{RESET}")
 
 
 

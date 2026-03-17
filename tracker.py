@@ -1,7 +1,7 @@
 from stock_api import fetch_stock_history, calculate_changes
 from ui import print_stock_info, print_error, RESET
 from AI_News import print_news
-from Portfolio import buy_stock, sell_stock, show_history, remove_last, show_portfolio
+from Portfolio import buy_stock, sell_stock, show_history, remove_last, show_portfolio, export_csv
 
 
 def process_input(user_input):
@@ -49,6 +49,7 @@ if __name__ == "__main__":
                 print(f"\033[93m    {'BUY <Ticker> <Amount> <Price>':<34}{RESET} : Add a BUY transaction\n")
                 print(f"\033[93m    {'SELL <Ticker> <Amount> <Price>':<34}{RESET} : Add a SELL transaction\n")
                 print(f"\033[93m    {'PORTFOLIO':<34}{RESET} : Show holdings + P/L\n")
+                print(f"\033[93m    {'EXPORT':<34}{RESET} : Export transaction history to CSV\n")
                 print(f"\033[93m    {'HISTORY':<34}{RESET} : Show full transaction history\n")
                 print(f"\033[93m    {'HISTORY -<Ticker> [-<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
                 print(f"\033[93m    {'REMOVE':<34}{RESET} : Remove last transaction (undo)\n")
@@ -61,6 +62,7 @@ if __name__ == "__main__":
                 print("      BUY VOO 1.57 593.32")
                 print("      SELL VOO 0.50 615.10")
                 print("      PORTFOLIO")
+                print("      EXPORT")
                 print("      HISTORY")
                 print("      HISTORY -VOO")
                 print("      HISTORY -VOO -AAPL")
@@ -91,6 +93,9 @@ if __name__ == "__main__":
 
             elif command == "portfolio":
                 show_portfolio()
+            
+            elif command == "export":
+                export_csv()
 
             elif cmd:
                 process_input(cmd)
