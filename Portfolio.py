@@ -164,6 +164,7 @@ def show_portfolio():
     print ("-" * 125)
     total_profit = 0
     total_cost = 0
+    total_daily_gain = 0
     for ticker, (qty, avg_cost) in current_holdings.items():
         current_price = prices.get(ticker)
         if current_price:
@@ -179,21 +180,23 @@ def show_portfolio():
             all_time_pct = ((current_price - avg_cost) / avg_cost) * 100 if avg_cost > 0 else 0
             total_cost += avg_cost * qty
             total_profit += all_time_gain
+            total_daily_gain += daily_gain
             pnl_color = GREEN if all_time_gain >= 0 else RED
             daily_color = GREEN if daily_gain >= 0 else RED
             allocation_pct = ((avg_cost * qty) / total_value) * 100 if total_value > 0 else 0
             print(f"  {ticker:<7}{qty:<7} ${avg_cost * qty:<7.2f}  ${avg_cost:<10.2f} ${current_price:<14.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<8.2f}{RESET} {pnl_color}{all_time_pct:>12.2f}%{RESET} {allocation_pct:>12.2f}%")
         else:
             print(f"  {ticker:<6}  {qty:<8} ${avg_cost * qty:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A             N/A")
+    
     total_color = GREEN if total_profit >= 0 else RED
     total_value = total_cost + total_profit
     total_pct = (total_profit / total_cost) * 100 if total_cost > 0 else 0
+    total_dailt_pct = (total_daily_gain / (total_value - total_daily_gain)) * 100 if (total_value - total_daily_gain) > 0 else 0
+    total_daily_color = GREEN if total_daily_gain >= 0 else RED
 
-    # total_daily_gain = sum(
-    #     (prices[Ticker] )
-    # )
 
     print(f"\nTotal Portfolio value: ${total_value:.2f}")
+    print(f"Daily Gain: {total_daily_color}${total_daily_gain:.2f} {total_dailt_pct:.2f}%{RESET}")
     print(f"Total Profit: {total_color}${total_profit:.2f} {total_pct:.2f}%{RESET}")
 
     print("\n")
