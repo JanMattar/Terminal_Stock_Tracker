@@ -44,26 +44,29 @@ if __name__ == "__main__":
                 header = "AVAILABLE COMMANDS"
                 print(f"\n{header.center(70)}")
                 print("=" * 80)
-                print(f"\033[93m    {'<Ticker>':<30}{RESET} : Fetch stock information for a ticker\n")
-                print(f"\033[93m    {'<Ticker> -NEWS':<30}{RESET} : Fetch stock info + AI news summary\n")
-                print(f"\033[93m    {'BUY <Ticker> <Amount> <Price>':<30}{RESET} : Add a BUY transaction\n")
-                print(f"\033[93m    {'SELL <Ticker> <Amount> <Price>':<30}{RESET} : Add a SELL transaction\n")
-                print(f"\033[93m    {'PORTFOLIO':<30}{RESET} : Show current holdings and performance\n")
-                print(f"\033[93m    {'HISTORY':<30}{RESET} : Show transaction history\n")
-                print(f"\033[93m    {'REMOVE':<30}{RESET} : Remove last transaction (undo)\n")
-                print(f"\033[93m    {'HELP':<30}{RESET} : Show this help menu\n")
-                print(f"\033[93m    {'EXIT / QUIT / Q':<30}{RESET} : Exit the program\n")
-                print("=" * 80)
+                print(f"\n\033[93m    {'<Ticker>':<34}{RESET} : Fetch stock information\n")
+                print(f"\033[93m    {'<Ticker> -NEWS':<34}{RESET} : Fetch stock info + AI news summary\n")
+                print(f"\033[93m    {'BUY <Ticker> <Amount> <Price>':<34}{RESET} : Add a BUY transaction\n")
+                print(f"\033[93m    {'SELL <Ticker> <Amount> <Price>':<34}{RESET} : Add a SELL transaction\n")
+                print(f"\033[93m    {'PORTFOLIO':<34}{RESET} : Show holdings + P/L\n")
+                print(f"\033[93m    {'HISTORY':<34}{RESET} : Show full transaction history\n")
+                print(f"\033[93m    {'HISTORY -<Ticker> [-<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
+                print(f"\033[93m    {'REMOVE':<34}{RESET} : Remove last transaction (undo)\n")
+                print(f"\033[93m    {'HELP':<34}{RESET} : Show this help menu\n")
+                print(f"\033[93m    {'EXIT / QUIT / Q':<34}{RESET} : Exit the program\n")
+                print("-" * 80)
                 print("\n    EXAMPLES:")
-                print("     VOO")
-                print("     VOO -NEWS")
-                print("     BUY VOO 1.57 593.32")
-                print("     SELL VOO 0.50 615.10")
-                print("     PORTFOLIO")
-                print("     REMOVE")
-                print("     HISTORY\n")
+                print("      VOO")
+                print("      VOO -NEWS")
+                print("      BUY VOO 1.57 593.32")
+                print("      SELL VOO 0.50 615.10")
+                print("      PORTFOLIO")
+                print("      HISTORY")
+                print("      HISTORY -VOO")
+                print("      HISTORY -VOO -AAPL")
+                print("      REMOVE\n")
                 print("=" * 80)
-                print("\n")
+                print()
 
             elif command == "buy" and len(args) == 3:
                 ticker, qty, price = args[0], round(float(args[1]), 4), round(float(args[2]), 2)
@@ -74,7 +77,14 @@ if __name__ == "__main__":
                 sell_stock(ticker, qty, price)
 
             elif command == "history":
-                show_history()
+                if not args:
+                    show_history()
+                else:
+                    tickers = [a.lstrip('-').upper() for a in args if a.startswith('-') and len(a) > 1]
+                    if not tickers:
+                        print_error("Usage: HISTORY -<Ticker> -<Ticker> | Example: HISTORY -VOO -AAPL")
+                    else:
+                        show_history(tickers)
 
             elif command == "remove":
                 remove_last()

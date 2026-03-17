@@ -1,21 +1,34 @@
 # Terminal Stock Tracker
 
-A lightweight, high-speed terminal tool to track US stocks and get AI-powered news analysis. Built to be fast, readable, and resilient.
+A simple, fast terminal tool to track US stocks, manage a local portfolio, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
 
-### The Architecture (A Hybrid Approach)
-I built this project to balance speed and reliability by mixing two different data retrieval strategies:
+### The Architecture
+I built this project to balance speed and reliability:
 
-Prices (yfinance): Uses an unofficial web scraper. It's the fastest, free way to get live market data, but it can be brittle.
+Prices (yfinance): Uses yfinance to grab live market data and historical charts. Fast and free.
 
-News (Yahoo RSS): Bypasses web scraping entirely. Because news scrapers frequently break or get shadowbanned, I wrote a custom XML fetcher that pulls directly from Yahoo’s official RSS syndication.
+Portfolio Ledger: All BUY and SELL transactions are saved locally to a Portfolio.json file. The app calculates your current holdings, average cost, and Profit/Loss (P&L) on the fly by reading this history.
 
-Analysis (gemini-2.0-flash-lite): Uses Google's high-speed "Lite" model to summarize the RSS headlines. I implemented text streaming so the AI's thoughts print to the terminal instantly, character-by-character.
+News (Yahoo RSS + Gemini): Bypasses brittle web scrapers by pulling directly from Yahoo’s official RSS XML feed. The headlines are then streamed through Google's gemini-2.5-flash-lite model for a quick, character-by-character summary of why the stock is moving.
 
 ### Quick Start
+
 Install dependencies: pip install yfinance google-genai python-dotenv
 
 Add your key: Create a .env file and add GEMINI_API_KEY=your_key_here
 
-Run it: python tracker.py
+Run it: python3 tracker.py
 
-Example: Type NVDA -NEWS to see the live price followed by the AI market summary.
+### Available Commands
+
+| Command | Description | Example |
+| :--- | :--- | :--- |
+| `<Ticker>` | Get current price and historical performance | `VOO` |
+| `<Ticker> -NEWS` | Get stock info + AI news summary | `VOO -NEWS` |
+| `BUY` | Buy shares (saved to local ledger) | `BUY VOO 1.57 593.32` |
+| `SELL` | Sell shares | `SELL VOO 0.50 615.10` |
+| `PORTFOLIO` | View current holdings, average cost, and P&L | `PORTFOLIO` |
+| `HISTORY` | View all past transactions | `HISTORY` |
+| `HISTORY -<Ticker> [-<Ticker>...] | Filter history by ticker(s) | HISTORY -VOO -AAPL |
+| `REMOVE` | Undo the last transaction | `REMOVE` |
+| `HELP` | Show the help menu | `HELP` |

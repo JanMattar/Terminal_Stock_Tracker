@@ -68,18 +68,34 @@ def remove_last():
         return
     removed = ledger.pop()
     save_ledger(ledger)
-    print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f}$.{RESET}")
+    print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f}.{RESET}")
 
-def show_history():
+def show_history(tickers=None):
     ledger = load_ledger()
     if not ledger:
         print("No transactions found.")
         return
+
+    ticker_filter = {t.upper() for t in tickers} if tickers else None
+
+    filtered = []
+    for entry in ledger:
+        entry_ticker = entry['ticker'].upper()
+        if ticker_filter is None or entry_ticker in ticker_filter:
+            filtered.append(entry)
+
+    if not filtered:
+        if ticker_filter:
+            print_error(f"No transactions found for tickers: {', '.join(ticker_filter)}.")
+        else:
+            print("No transactions found.")
+        return
+
     print(f"\n{'--- TRANSACTION HISTORY ---'.center(60)}")
     print(f" {'Date':^18} {'Action':^8}{'Ticker':^9} {'Shares':^5}  {'Price':^10} {'Total':^8}")
     print("-" * 64)
 
-    for entry in ledger:
+    for entry in filtered:
         date = datetime.fromisoformat(entry["timestamp"])
         nice_time = date.strftime("%Y-%m-%d %H:%M")
         total = entry['quantity'] * entry['price']
@@ -110,9 +126,9 @@ def show_portfolio():
         print("No current holdings. Your portfolio is empty.")
         return
 
-    print(f"\n{'--- PORTFOLIO ---'.center(80)}")
-    print(f" {'Ticker':^7} {'Shares':^7} {'Avg-Cost':^9} {'Current':^7} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change'}")
-    print ("-" * 94)
+    print(f"\n{'--- PORTFOLIO ---'.center(95)}")
+    print(f" {'Ticker':^7} {'Shares':^6} {'Holdings':^10} {'Avg-Cost':^9} {'Current-Price':^13} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change'}")
+    print ("-" * 110)
     total_profit = 0
     total_cost = 0
     for ticker, (qty, avg_cost) in current_holdings.items():
@@ -132,9 +148,9 @@ def show_portfolio():
             total_profit += all_time_gain
             pnl_color = GREEN if all_time_gain >= 0 else RED
             daily_color = GREEN if daily_gain >= 0 else RED
-            print(f"  {ticker:<7}{qty:<6}  ${avg_cost:<8.2f} ${current_price:<10.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<15}{RESET}{pnl_color}${all_time_gain:<10.2f}{RESET} {pnl_color}{all_time_pct:>9.2f}%{RESET}")
+            print(f"  {ticker:<7}{qty:<7} ${avg_cost * qty:<7.2f}  ${avg_cost:<10.2f} ${current_price:<14.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<10.2f}{RESET} {pnl_color}{all_time_pct:>9.2f}%{RESET}")
         else:
-            print(f"  {ticker:<6}  {qty:<6} ${avg_cost:<10.2f} N/A       N/A          N/A             N/A             N/A")
+            print(f"  {ticker:<6}  {qty:<8} ${avg_cost * qty:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A")
     total_color = GREEN if total_profit >= 0 else RED
     total_value = total_cost + total_profit
     total_pct = (total_profit / total_cost) * 100 if total_cost > 0 else 0
