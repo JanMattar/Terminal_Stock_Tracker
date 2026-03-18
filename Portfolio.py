@@ -6,6 +6,7 @@ from ui import print_error, RED, GREEN, RESET, YELLOW
 import csv
 from AI import analyze_portfolio
 import plotext as plt
+from contextlib import redirect_stdout, redirect_stderr
 
 PORTFOLIO_FILE = "data/Portfolio.json"
 
@@ -280,7 +281,9 @@ def show_portfolio(ai_analysis=False, benchmark=False, chart=False):
         try:
             first_date = min(entry["timestamp"][:10] for entry in ledger)
             
-            voo_history = yf.Ticker("VOO").history(start=first_date)
+            with open(os.devnull, 'w') as devnull:
+                with redirect_stderr(devnull), redirect_stdout(devnull):
+                    voo_history = yf.Ticker("VOO").history(start=first_date)
             
             if not voo_history.empty:
                 voo_old = voo_history['Close'].iloc[0]
@@ -300,7 +303,7 @@ def show_portfolio(ai_analysis=False, benchmark=False, chart=False):
 
     if chart:
         draw_allocation_chart(chart_tickers, chart_allocations)
-        
+
     if ai_analysis and total_value > 0:
         analyze_portfolio(ai_allocations_string)
     
@@ -336,7 +339,7 @@ def draw_allocation_chart(tickers, allocations):
     plt.theme('clear')
     plt.bar(tickers, allocations, color='green')
     plt.title("Portfolio Allocation (%)")
-    plt.plotsize(100, 20)
+    plt.plotsize(100, 15)
 
     print()
     plt.show()
