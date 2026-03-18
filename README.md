@@ -2,7 +2,7 @@
 
 A simple, fast terminal tool to manage a local stock portfolio, track live performance, and get AI-summarized market news. Built to be readable and resilient without needing a heavy database.
 
-### The Architecture
+## The Architecture
 
 I built this project to balance speed, privacy, and reliability:
 
@@ -16,17 +16,25 @@ I built this project to balance speed, privacy, and reliability:
 
 **Containerized Environment:** Fully Dockerized for a seamless experience across any operating system without polluting your local Python environment.
 
-### Quick Start
+## Quick Start
 
-Add your key: Create a .env file and add GEMINI_API_KEY=your_key_here
+You can run this tracker instantly using the pre-built Docker image, or build it yourself from the source code.
+(replace `your_api_key` with your actual Gemini API key)
 
-Run it: Make sure Docker is installed, then run `docker compose run tracker`
+#### Option 1: Run Instantly (Recommended)
+```bash
+docker run -it -v ./data:/app/data -e GEMINI_API_KEY="your_api_key" jeanmatar16/terminal-portfolio-tracker
+```
 
-### Troubleshooting
+#### Option 2: Build from Source
+```bash
+git clone https://github.com/JanMattar/Terminal-Portfolio-Tracker.git
+cd Terminal-Portfolio-Tracker
+echo "GEMINI_API_KEY=your_key_here" > .env
+docker compose run tracker
+```
 
-Permission Denied (Linux/WSL): If you get a Docker permission error, run `sudo docker compose run tracker`.
-
-### Available Commands
+## Available Commands
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
