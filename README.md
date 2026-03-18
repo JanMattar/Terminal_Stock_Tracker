@@ -49,6 +49,6 @@ docker compose run tracker
 | `PORTFOLIO -VS` | View current holdings, average cost, and Profit + Compare vs S&P 500 | `PORTFOLIO -VS` |
 | `EXPORT` | Export transaction history to CSV | `EXPORT` |
 | `HISTORY` | View all past transactions | `HISTORY` |
-| `HISTORY -<Ticker> [-<Ticker>...]` | Filter history by ticker(s) | `HISTORY -VOO -AAPL` |
+| `HISTORY <Ticker> [<Ticker>...]` | Filter history by ticker(s) | `HISTORY VOO AAPL` |
 | `REMOVE` | Undo the last transaction | `REMOVE` |
 | `HELP` | Show the help menu | `HELP` |

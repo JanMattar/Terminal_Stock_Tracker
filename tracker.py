@@ -59,7 +59,7 @@ if __name__ == "__main__":
                 print(f"\033[93m    {'PORTFOLIO -VS':<34}{RESET} : View current holdings, average cost, and Profit + Compare vs S&P 500\n")
                 print(f"\033[93m    {'EXPORT':<34}{RESET} : Export transaction history to CSV\n")
                 print(f"\033[93m    {'HISTORY':<34}{RESET} : Show full transaction history\n")
-                print(f"\033[93m    {'HISTORY -<Ticker> [-<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
+                print(f"\033[93m    {'HISTORY <Ticker> [<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
                 print(f"\033[93m    {'REMOVE':<34}{RESET} : Remove last transaction (undo)\n")
                 print(f"\033[93m    {'HELP':<34}{RESET} : Show this help menu\n")
                 print(f"\033[93m    {'EXIT / QUIT / Q':<34}{RESET} : Exit the program\n")
@@ -72,8 +72,8 @@ if __name__ == "__main__":
                 print("      PORTFOLIO -AI -VS")
                 print("      EXPORT")
                 print("      HISTORY")
-                print("      HISTORY -VOO")
-                print("      HISTORY -VOO -AAPL")
+                print("      HISTORY VOO")
+                print("      HISTORY VOO AAPL")
                 print("      REMOVE\n")
                 print("=" * 80)
                 print()
@@ -112,11 +112,8 @@ if __name__ == "__main__":
                 if not args:
                     show_history()
                 else:
-                    tickers = [a.lstrip('-').upper() for a in args if a.startswith('-') and len(a) > 1]
-                    if not tickers:
-                        print_error("Usage: HISTORY -<Ticker> -<Ticker> | Example: HISTORY -VOO -AAPL")
-                    else:
-                        show_history(tickers)
+                    tickers = [a.upper() for a in args]
+                    show_history(tickers)
 
             elif command == "remove":
                 remove_last()
