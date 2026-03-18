@@ -23,7 +23,7 @@ You can run this tracker instantly using the pre-built Docker image, or build it
 
 #### Option 1: Run Instantly (Recommended)
 ```bash
-docker run -it -v ./data:/app/data -e GEMINI_API_KEY="your_api_key" jeanmatar16/terminal-portfolio-tracker
+docker run --pull always -it -v ./data:/app/data -e GEMINI_API_KEY="your_api_key" jeanmatar16/terminal-portfolio-tracker
 ```
 
 #### Option 2: Build from Source
