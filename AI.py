@@ -77,7 +77,7 @@ def analyze_portfolio(portfolio_summary):
         prompt = f"Here is my current stock portfolio allocation:\n{portfolio_summary}\n\nAct as a blunt, professional financial advisor. Provide a brief, concise analysis (under 3 sentences) of this portfolio, focusing purely on diversification and risk and then provide advices if needed (maximum 3)."
         response = client.models.generate_content_stream(model="gemini-2.5-flash-lite", contents=prompt)
 
-        print(f"\n{'--- AI PORTFOLIO ANALYSIS ---'.center(120)}")
+        print(f"\n{'--- AI PORTFOLIO ANALYSIS ---'.center(145)}")
         for chunk in response:
             print(chunk.text, end="", flush=True)
         print()
