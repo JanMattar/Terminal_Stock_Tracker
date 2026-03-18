@@ -3,6 +3,7 @@ import plotext as plt
 RED = "\033[91m"
 GREEN = "\033[92m"
 RESET = "\033[0m"
+YELLOW = "\033[93m"
 
 def format_percentage(value):
     if value >= 0:

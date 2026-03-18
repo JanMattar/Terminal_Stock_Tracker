@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 import yfinance as yf
-from ui import print_error, RED, GREEN, RESET
+from ui import print_error, RED, GREEN, RESET, YELLOW
 import csv
 from AI import analyze_portfolio
 
@@ -84,17 +84,27 @@ def sell_stock(ticker, quantity, price, date_str=None):
     date_display = date_str if date_str else datetime.now().strftime("%Y-%m-%d")
     print(f"{RED}Sold {quantity} shares of {ticker.upper()} at ${price:.2f} for a total of ${quantity * price:.2f} (Date: {date_display}){RESET}")
 
-def add_dividend(ticker, amount):
+def add_dividend(ticker, amount, date_str=None):
     ledger = load_ledger()
+    if date_str:
+        try:
+            datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            print_error("Invalid date format. Use YYYY-MM-DD (e.g., 2025-01-15)")
+            return
+        timestamp = f"{date_str}T12:00:00.000000"
+    else:
+        timestamp = datetime.now().isoformat()
     ledger.append({
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": timestamp,
         "action": "DIVIDEND",
         "ticker": ticker.upper(),
         "quantity": 0.0,
         "price": amount
     })
     save_ledger(ledger)
-    print(f"{GREEN}Dividend of ${amount} recorded for {ticker.upper()}{RESET}")
+    date_display = date_str if date_str else datetime.now().strftime("%Y-%m-%d")
+    print(f"{GREEN}Dividend of ${amount} recorded for {ticker.upper()} (Date: {date_display}){RESET}")
 
 
 def remove_last():
@@ -104,10 +114,11 @@ def remove_last():
         return
     removed = ledger.pop()
     save_ledger(ledger)
+    date_display = datetime.fromisoformat(removed['timestamp']).strftime("%Y-%m-%d")
     if removed['action'] == 'DIVIDEND':
-        print(f"{RED}Removed last transaction: {removed['action']} ${removed['price']:.2f} for {removed['ticker']}{RESET}")
+        print(f"{RED}Removed last transaction: {removed['action']} ${removed['price']:.2f} for {removed['ticker']}{RESET} on {date_display}.")
     else:
-        print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f}.{RESET}")
+        print(f"{RED}Removed last transaction: {removed['action']} {removed['quantity']} shares of {removed['ticker']} at ${removed['price']:.2f} at a total of ${removed['quantity'] * removed['price']:.2f} (Date: {date_display}){RESET}")
 
 def show_history(tickers=None):
     ledger = load_ledger()
@@ -130,19 +141,29 @@ def show_history(tickers=None):
             print("No transactions found.")
         return
 
+    filtered.sort(key=lambda entry: entry["timestamp"])
+
     print(f"\n{'--- TRANSACTION HISTORY ---'.center(60)}")
-    print(f" {'Date':^18} {'Action':^8}{'Ticker':^9} {'Shares':^5}  {'Price':^10} {'Total':^8}")
+    print(f" {'Date':^10} {'Action':^11}{'Ticker':^7}  {'Shares':^7} {'Price':^10} {'Total':^8}")
     print("-" * 64)
 
     for entry in filtered:
         date = datetime.fromisoformat(entry["timestamp"])
-        nice_time = date.strftime("%Y-%m-%d %H:%M")
+        nice_time = date.strftime("%Y-%m-%d")
         total = entry['price'] if entry['action'] == 'DIVIDEND' else entry['quantity'] * entry['price']
-        if entry['action'] != 'DIVIDEND':
-            print(f" {nice_time:<20} {entry['action']:<7} {entry['ticker']:<7} {entry['quantity']:<7}  ${entry['price']:<8.2f} ${total:<10.2f}")
+        if entry['action'] == 'BUY':
+            print(f" {nice_time:<13} {GREEN}{entry['action']:<8}{RESET} {entry['ticker']:<8} {entry['quantity']:<6}  ${entry['price']:<8.2f} ${total:<10.2f}")
+        elif entry['action'] == 'SELL':
+            print(f" {nice_time:<13} {RED}{entry['action']:<8}{RESET} {entry['ticker']:<8} {entry['quantity']:<6}  ${entry['price']:<8.2f} ${total:<10.2f}")
         elif entry['action'] == 'DIVIDEND':
-            print(f" {nice_time:<18} {entry['action']:<9} {entry['ticker']:<7} {entry['quantity']:<7}  ${entry['price']:<8.2f} ${total:<10.2f}")
+            print(f" {nice_time:<11} {YELLOW}{entry['action']:<9}{RESET}  {entry['ticker']:<7}  {entry['quantity']:<7} ${entry['price']:<8.2f} ${total:<10.2f}")
     print("\n")
+
+
+        #     if entry['action'] != 'DIVIDEND':
+        #     print(f" {nice_time:<13} {entry['action']:<8} {entry['ticker']:<8} {entry['quantity']:<6}  ${entry['price']:<8.2f} ${total:<10.2f}")
+        # elif entry['action'] == 'DIVIDEND':
+        #     print(f" {nice_time:<11} {entry['action']:<9}  {entry['ticker']:<7}  {entry['quantity']:<7} ${entry['price']:<8.2f} ${total:<10.2f}")
 
 def get_current_price(ticker):
     try:
@@ -206,7 +227,7 @@ def show_portfolio(ai_analysis=False, benchmark=False):
         print("\n")
         return
 
-    print(f" {'Ticker':^7} {'Shares':^6} {'Holdings':^10} {'Avg-Cost':^9} {'Current-Price':^13} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change':^16} {'Allocation':^11}")
+    print(f" {'Ticker':^7}  {'Shares':^6}  {'Holdings':^10}  {'Avg-Cost':^9} {'Current-Price':^13} {'Daily-gain':^12} {'Daily-change':^13} {'All-Time-gain':^14} {'All-Time-change':^16} {'Allocation':^11}")
     print ("-" * 125)
     total_profit = 0
     total_cost = 0
@@ -233,9 +254,11 @@ def show_portfolio(ai_analysis=False, benchmark=False):
             daily_color = GREEN if daily_gain >= 0 else RED
             allocation_pct = ((avg_cost * qty) / total_value) * 100 if total_value > 0 else 0
             ai_allocations_string += f"{ticker}: {allocation_pct:.2f}%, "
-            print(f"  {ticker:<7}{qty:<7.4f} ${avg_cost * qty:<7.2f}  ${avg_cost:<10.2f} ${current_price:<14.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<8.2f}{RESET} {pnl_color}{all_time_pct:>12.2f}%{RESET} {allocation_pct:>12.2f}%")
+            #for alignment
+            holdings_value = float(round(avg_cost * qty, 2)) if avg_cost * qty < 10000 else int(avg_cost * qty)
+            print(f"  {ticker:<7} {qty:<9.4f}${holdings_value:<10.2f}${avg_cost:<10.2f} ${current_price:<13.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<8.2f}{RESET} {pnl_color}{all_time_pct:>12.2f}%{RESET} {allocation_pct:>12.2f}%")
         else:
-            print(f"  {ticker:<6}  {qty:<8} ${avg_cost * qty:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A             N/A")
+            print(f"  {ticker:<6}   {qty:<8}  ${holdings_value:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A             N/A")
     
     for ticker, qty in holdings.items():
         if qty == 0:

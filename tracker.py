@@ -1,5 +1,5 @@
 from stock_api import fetch_stock_history, calculate_changes
-from ui import print_stock_info, print_error, RESET, draw_1y_chart
+from ui import print_stock_info, print_error, RESET, draw_1y_chart, YELLOW
 from AI import print_news
 from Portfolio import buy_stock, sell_stock, show_history, remove_last, show_portfolio, export_csv, add_dividend
 
@@ -48,21 +48,21 @@ if __name__ == "__main__":
                 header = "AVAILABLE COMMANDS"
                 print(f"\n{header.center(70)}")
                 print("=" * 80)
-                print(f"\n\033[93m    {'<Ticker>':<34}{RESET} : Fetch stock information\n")
-                print(f"\033[93m    {'<Ticker> -NEWS':<34}{RESET} : Get stock info + AI news summary\n")
-                print(f"\033[93m    {'<Ticker> -CH':<34}{RESET} : Get stock info + Plot 1Y chart\n")
-                print(f"\033[93m    {'BUY <Ticker> <Amt> <Price> [Date]':<34}{RESET} : Add a BUY transaction (Date: YYYY-MM-DD, optional)\n")
-                print(f"\033[93m    {'SELL <Ticker> <Amt> <Price> [Date]':<34}{RESET} : Add a SELL transaction (Date: YYYY-MM-DD, optional)\n")
-                print(f"\033[93m    {'DIVIDEND <Ticker> <Amount>':<34}{RESET} : Record a dividend payment\n")
-                print(f"\033[93m    {'PORTFOLIO':<34}{RESET} : View current holdings, average cost, and Profit\n")
-                print(f"\033[93m    {'PORTFOLIO -AI':<34}{RESET} : View current holdings, average cost, and Profit + AI Portfolio Analysis\n")
-                print(f"\033[93m    {'PORTFOLIO -VS':<34}{RESET} : View current holdings, average cost, and Profit + Compare vs S&P 500\n")
-                print(f"\033[93m    {'EXPORT':<34}{RESET} : Export transaction history to CSV\n")
-                print(f"\033[93m    {'HISTORY':<34}{RESET} : Show full transaction history\n")
-                print(f"\033[93m    {'HISTORY <Ticker> [<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
-                print(f"\033[93m    {'REMOVE':<34}{RESET} : Remove last transaction (undo)\n")
-                print(f"\033[93m    {'HELP':<34}{RESET} : Show this help menu\n")
-                print(f"\033[93m    {'EXIT / QUIT / Q':<34}{RESET} : Exit the program\n")
+                print(f"\n{YELLOW}    {'<Ticker>':<34}{RESET} : Fetch stock information\n")
+                print(f"{YELLOW}    {'<Ticker> -NEWS':<34}{RESET} : Get stock info + AI news summary\n")
+                print(f"{YELLOW}    {'<Ticker> -CH':<34}{RESET} : Get stock info + Plot 1Y chart\n")
+                print(f"{YELLOW}    {'BUY <Ticker> <Amt> <Price> [Date]':<34}{RESET} : Add a BUY transaction (Date: YYYY-MM-DD, optional)\n")
+                print(f"{YELLOW}    {'SELL <Ticker> <Amt> <Price> [Date]':<34}{RESET} : Add a SELL transaction (Date: YYYY-MM-DD, optional)\n")
+                print(f"{YELLOW}    {'DIVIDEND <Ticker> <Amount>':<34}{RESET} : Record a dividend payment\n")
+                print(f"{YELLOW}    {'PORTFOLIO':<34}{RESET} : View current holdings, average cost, and Profit\n")
+                print(f"{YELLOW}    {'PORTFOLIO -AI':<34}{RESET} : View current holdings, average cost, and Profit + AI Portfolio Analysis\n")
+                print(f"{YELLOW}    {'PORTFOLIO -VS':<34}{RESET} : View current holdings, average cost, and Profit + Compare vs S&P 500\n")
+                print(f"{YELLOW}    {'EXPORT':<34}{RESET} : Export transaction history to CSV\n")
+                print(f"{YELLOW}    {'HISTORY':<34}{RESET} : Show full transaction history\n")
+                print(f"{YELLOW}    {'HISTORY <Ticker> [<Ticker>...]':<34}{RESET} : Filter history by ticker(s)\n")
+                print(f"{YELLOW}    {'REMOVE':<34}{RESET} : Remove last transaction (undo)\n")
+                print(f"{YELLOW}    {'HELP':<34}{RESET} : Show this help menu\n")
+                print(f"{YELLOW}    {'EXIT / QUIT / Q':<34}{RESET} : Exit the program\n")
                 print("-" * 80)
                 print("\n    EXAMPLES:")
                 print("      VOO")
@@ -102,14 +102,15 @@ if __name__ == "__main__":
                     print_error("Usage: SELL <Ticker> <Amount> <Price> [YYYY-MM-DD] | Example: SELL VOO 0.50 615.10 2025-06-01")
 
             elif command == "dividend":
-                if len(args) != 2:
-                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> | Example: DIVIDEND VOO 1.57")
+                if len(args) not in [2, 3]:
+                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> [YYYY-MM-DD] | Example: DIVIDEND VOO 1.57 2025-01-15")
                     continue
                 try:
                     ticker, amount = args[0].upper(), round(float(args[1]), 2)
-                    add_dividend(ticker, amount)
+                    date_str = args[2] if len(args) == 3 else None
+                    add_dividend(ticker, amount, date_str)
                 except ValueError:
-                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> | Example: DIVIDEND VOO 1.57")
+                    print_error("Invalid input for DIVIDEND command. Usage: DIVIDEND <Ticker> <Amount> [YYYY-MM-DD] | Example: DIVIDEND VOO 1.57 2025-01-15")
 
             elif command == "history":
                 if not args:
