@@ -27,7 +27,7 @@ def process_input(user_input):
 
 if __name__ == "__main__":
     try:
-        welcome = "WELCOME TO THE TERMINAL STOCK TRACKER!"
+        welcome = "WELCOME TO THE TERMINAL PORTFOLIO TRACKER!"
         help_hint = "TYPE 'HELP' FOR AVAILABLE COMMANDS"
         print(f"\n{welcome.center(50)}")
         print(f"{help_hint.center(50)}\n")
