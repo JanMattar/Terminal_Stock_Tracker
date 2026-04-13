@@ -256,7 +256,7 @@ def show_portfolio(ai_analysis=False, benchmark=False, chart=False):
             chart_allocations.append(round(allocation_pct, 2))
             ai_allocations_string += f"{ticker}: {allocation_pct:.2f}%, "
             #for alignment
-            holdings_value = float(round(avg_cost * qty, 2)) if avg_cost * qty < 10000 else int(avg_cost * qty)
+            holdings_value = float(round(current_price * qty, 2)) if current_price * qty < 10000 else int(current_price * qty)
             print(f"  {ticker:<7} {qty:<9.4f}${holdings_value:<10.2f}${avg_cost:<10.2f} ${current_price:<13.2f}{daily_color}${daily_gain:<12.2f}{RESET}{daily_color}{f'{daily_pct:.2f}%':<14}{RESET}{pnl_color}${all_time_gain:<8.2f}{RESET} {pnl_color}{all_time_pct:>12.2f}%{RESET} {allocation_pct:>12.2f}%")
         else:
             print(f"  {ticker:<6}   {qty:<8}  ${holdings_value:<8.2f} ${avg_cost:<8.2f} N/A       N/A          N/A             N/A             N/A             N/A")
