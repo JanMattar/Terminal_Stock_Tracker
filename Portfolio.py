@@ -271,9 +271,16 @@ def show_portfolio(ai_analysis=False, benchmark=False, chart=False):
     total_daily_pct = (total_daily_gain / (total_value - total_daily_gain)) * 100 if (total_value - total_daily_gain) > 0 else 0
     total_daily_color = GREEN if total_daily_gain >= 0 else RED
 
+    total_realized = sum(realized_profits.values()) + sum(dividends.values())
+    total_unrealized = total_profit - total_realized 
+    unrealized_color = GREEN if total_unrealized >= 0 else RED
+    realized_color = GREEN if total_realized >= 0 else RED
+
 
     print(f"\nTotal Portfolio value : ${total_value:.2f}")
     print(f"     Daily Gain       : {total_daily_color}${total_daily_gain:.2f} {total_daily_pct:.2f}%{RESET}")
+    print(f"  Unrealized Profit   : {unrealized_color}${total_unrealized:.2f}{RESET}")
+    print(f"   Realized Profit    : {realized_color}${total_realized:.2f}{RESET}")
     print(f"    Total Profit      : {total_color}${total_profit:.2f} {total_pct:.2f}%{RESET}")
     print("\n")
 
